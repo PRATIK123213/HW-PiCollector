@@ -1,0 +1,11 @@
+- hosts: raspberrypi
+  become: yes
+  tasks:
+    - name: Reload systemd to apply the new services
+      command: systemctl daemon-reload
+    
+    - name: Enable and start data collection service
+      systemd:
+        name: coomep_collect_data.service
+        enabled: yes
+        state: started

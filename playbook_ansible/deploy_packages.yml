@@ -1,0 +1,22 @@
+- hosts: raspberrypi
+  become: yes
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+        - jq
+        - openconnect
+        - python3
+        - python3-venv
+        state: present
+        update_cache: yes
+
+    - name: Create a virtual environment
+      command: python3 -m venv /opt/coomep/coomep_venv
+      args:
+        creates: /opt/coomep/coomep_venv
+
+    - name: Install required Python packages in virtual environment
+      pip:
+        requirements: /opt/coomep/requirements.txt
+        virtualenv: /opt/coomep/coomep_venv

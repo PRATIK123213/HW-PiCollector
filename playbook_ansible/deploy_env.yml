@@ -1,0 +1,27 @@
+- name: Create a folder on all Raspberry Pi
+  hosts: raspberrypi
+  become: yes
+  tasks:
+    - name: Create the coomep folder
+      file:
+        path: /opt/coomep
+        state: directory
+        mode: '0755'
+    - name: Create the data folder
+      file:
+        path: /opt/coomep/data
+        state: directory
+        mode: '0755'
+    - name: Create the src folder
+      file:
+        path: /opt/coomep/src
+        state: directory
+        mode: '0755'
+    - name: Create the bash folder
+      file:
+        path: /opt/coomep/src/bash
+        state: directory
+        mode: '0755'
+    - name: Create the log folder
+      file:
+        path: /var/log/coomep

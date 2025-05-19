@@ -1,0 +1,14 @@
+[Unit]
+Description=Collect the data from HomeWizard sensors
+After=network-online.target openvpn.service
+Wants=network-online.target
+Requires=openvpn.service
+
+[Service]
+Type=simple
+ExecStart=/opt/coomep/coomep_venv/bin/python /opt/coomep/src/collect_homewizard_data.py
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

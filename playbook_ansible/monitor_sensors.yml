@@ -1,0 +1,80 @@
+---
+- name: Monitor Raspberry Pi and Homewizard devices
+  hosts: raspberrypi
+  become: yes
+  tasks:
+    - name: Check if the system is up
+      ping:
+
+    - name: Check disk space
+      command: df -h
+      register: disk_space
+
+    - name: Print disk space
+      debug:
+        msg: "{{ disk_space.stdout }}"
+
+    - name: Check CPU usage
+      shell: "top -bn1 | grep 'Cpu(s)' | awk '{print $2 + $4}'"
+      register: cpu_usage
+
+    - name: Print CPU usage
+      debug:
+        msg: "CPU Usage: {{ cpu_usage.stdout }}%"
+
+    - name: Check memory usage
+      shell: "free -m | awk 'NR==2{printf \"Memory Usage: %s/%sMB (%.2f%%)\", $3,$2,$3*100/$2 }'"
+      register: memory_usage
+
+    - name: Print memory usage
+      debug:
+        msg: "{{ memory_usage.stdout }}"
+
+    - name: Check for running services
+      service_facts:
+
+    - name: Filter services starting with coomep
+      set_fact:
+        coomep_services: "{{ ansible_facts.services | dict2items | selectattr('key', 'match', '^coomep.*') | list }}"
+
+    - name: Print services starting with coomep
+      debug:
+        msg: >
+          {{
+            {
+              "name": item.key,
+              "source": item.value.source,
+              "state": item.value.state,
+              "status": item.value.status
+            }
+          }}
+      loop: "{{ coomep_services }}"
+
+    - name: Generate IP address of the homewizard P1 sensor
+      set_fact:
+        ip_p1: "{{ ansible_host.split('.')[:-1] | join('.') }}.59"
+
+    - name: Check if the homewizard P1 sensor is online
+      shell: ping -c 1 {{ ip_p1 }}
+      register: ping_result_p1
+      failed_when: false
+
+    - name: Print status of the homewizard P1 sensor
+      debug:
+        msg: "P1 sensor IP {{ ip_p1 }} is {{'online :)' if ping_result_p1.rc == 0 else 'offline :('}}"
+    
+    - name: Check if PV are online or offline when user has PV
+      when: hostvars[inventory_hostname]['has_pv'] == 'true'
+      block:
+        - name: Generate IP address of the homewizard pv sensor
+          set_fact:
+            ip_pv: "{{ ansible_host.split('.')[:-1] | join('.') }}.101"
+
+        - name: Check if the homewizard PV sensor is online
+          shell: ping -c 1 {{ ip_pv }}
+          register: ping_result_pv
+          failed_when: false
+
+        - name: Print status of the homewizard PV sensor
+          debug:
+            msg: "PV sensor IP {{ ip_pv }} is {{ 'online :)' if ping_result_pv.rc == 0 else 'offline :(' }}"

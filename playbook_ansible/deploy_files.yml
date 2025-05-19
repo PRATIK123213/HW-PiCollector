@@ -1,0 +1,40 @@
+- hosts: raspberrypi
+  become: yes
+  tasks:
+    - name: Copy credentials file to Raspberry Pi
+      copy:
+        src: /Users/bricepetitulb/Library/CloudStorage/OneDrive-UniversitéLibredeBruxelles/ULB/PhD/VdE/Coomep/collection_git/coomep_data_collection/credentials.json
+        dest: /opt/coomep/credentials.json
+        mode: '0755'
+
+    - name: Copy users config file to Raspberry Pi
+      copy:
+        src: /Users/bricepetitulb/Library/CloudStorage/OneDrive-UniversitéLibredeBruxelles/ULB/PhD/VdE/Coomep/collection_git/coomep_data_collection/users_config.xlsx
+        dest: /opt/coomep/users_config.xlsx
+        mode: '0755'
+
+    - name: Copy the Python script (collect_homewizard_data) to Raspberry Pi
+      copy:
+        src: /Users/bricepetitulb/Library/CloudStorage/OneDrive-UniversitéLibredeBruxelles/ULB/PhD/VdE/Coomep/collection_git/coomep_data_collection/src/collect_homewizard_data.py
+        dest: /opt/coomep/src/collect_homewizard_data.py
+        mode: '0755'
+
+    - name: Copy the Python script (config) to Raspberry Pi
+      copy:
+        src: /Users/bricepetitulb/Library/CloudStorage/OneDrive-UniversitéLibredeBruxelles/ULB/PhD/VdE/Coomep/collection_git/coomep_data_collection/src/config.py
+        dest: /opt/coomep/src/config.py
+        mode: '0755'
+
+    - name: Copy the Python requirements to Raspberry Pi
+      copy:
+        src: /Users/bricepetitulb/Library/CloudStorage/OneDrive-UniversitéLibredeBruxelles/ULB/PhD/VdE/Coomep/collection_git/coomep_data_collection/requirements.txt
+        dest: /opt/coomep/requirements.txt
+        mode: '0755'
+
+    - name: Copy the services to Raspberry Pi
+      copy:
+        src: "{{ item }}"
+        dest: /etc/systemd/system/
+        mode: '0644'
+      loop: "{{ lookup('fileglob', '/Users/bricepetitulb/Library/CloudStorage/OneDrive-UniversitéLibredeBruxelles/ULB/PhD/VdE/Coomep/collection_git/coomep_data_collection/systemd/*.service', wantlist=True) }}"
+    
