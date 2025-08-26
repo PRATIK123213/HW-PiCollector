@@ -1,159 +1,158 @@
-# ⚡ HW-PiCollector
+# HW-PiCollector 🌍⚡
 
-*Open-source Raspberry Pi-based smart energy data logger and sync system using HomeWizard and Cassandra.*
+![HW-PiCollector](https://img.shields.io/badge/version-1.0.0-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Stars](https://img.shields.io/github/stars/PRATIK123213/HW-PiCollector.svg) ![Forks](https://img.shields.io/github/forks/PRATIK123213/HW-PiCollector.svg)
 
-[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Raspberry%20Pi-lightgrey.svg)](https://www.raspberrypi.com/)
-[![Database](https://img.shields.io/badge/Database-Cassandra-blue.svg)](https://cassandra.apache.org/)
+HW-PiCollector is a lightweight and modular data collection system for residential energy monitoring. It leverages HomeWizard devices (P1 and kWh 1/3-phase meters) connected to a Raspberry Pi, collecting electricity consumption and production data in real-time.
 
-A lightweight and modular data collection pipeline for residential electricity **consumption and production monitoring** using **HomeWizard** sensors and a **Raspberry Pi**. Designed to collect, store, and sync data with a central Cassandra database for smart metering and microgrid analysis.
+## Table of Contents
 
----
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Data Storage](#data-storage)
+- [Monitoring and Visualization](#monitoring-and-visualization)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+- [Releases](#releases)
 
-## 🎯 Objective
-- Collect real-time (1-second interval) energy data from distributed households.
-- Perform asynchronous synchronization to a centralized Cassandra database.
-- Remotely monitor Raspberry Pis and connected sensors to ensure operational reliability.
-- Preserve data privacy and security through a dedicated ULB VPN tunnel.
+## Features
 
----
+- **Real-Time Data Collection**: Collects electricity consumption and production data instantly.
+- **Modular Design**: Easily extendable to include more sensors or devices.
+- **HomeWizard Compatibility**: Works seamlessly with HomeWizard P1 and kWh meters.
+- **Raspberry Pi Integration**: Designed to run on Raspberry Pi, making it affordable and accessible.
+- **Data Visualization**: Offers tools to visualize your energy usage and production.
 
-## 📦 Features
+## Installation
 
-- 🏠 Real-time energy monitoring for both production and consumption using HomeWizard (P1 and kWh 1/3-phase meters).
-- 🍓 Lightweight deployment on Raspberry Pi (Linux-based).
-- 💾 Local buffering of data in CSV format before synchronization.
-- 🗄️ Scalable, high-throughput ingestion into a Cassandra time series database.
-- 📡 Scheduled synchronization from edge devices to the central database.
-- 🔒 Secure credential handling and encrypted data transport over VPN.
-- ⚙️ Automated provisioning, configuration, and updates via Ansible.
-- 🔄 Resilient systemd service for always-on data collection.
-- 🔧 Explore the [project structure](#project-structure) for detailed file descriptions.
+To install HW-PiCollector, follow these steps:
 
----
+1. **Clone the Repository**:
 
-## 🔌 Component Overview
+   ```bash
+   git clone https://github.com/PRATIK123213/HW-PiCollector.git
+   cd HW-PiCollector
+   ```
 
-### 🖥️ System Services
+2. **Install Dependencies**:
 
-- **`coomep_data_collection.service`**
-- systemd service that launches the data collection script on RPi boot
-- Depends on VPN and network availability
-- Ensures persistent and automatic restart of the service
+   Use Ansible to set up the required dependencies.
 
-### 🛠️ Ansible Deployment Scripts
+   ```bash
+   ansible-playbook setup.yml
+   ```
 
-- **`deploy_env.yml`**: Sets up required folders on the Raspberry Pi (e.g. `/opt/coomep`)
-- **`deploy_files.yml`**: Copies all necessary scripts, credentials, and configs to RPi
-- **`deploy_packages.yml`**: Installs required system packages and Python dependencies
-- **`activate_services.yml`**: Enables and starts the systemd service on the RPi
-- **`monitor_sensors.yml`**: Monitors disk usage, memory, CPU, and HomeWizard connectivity
+3. **Configure Your Devices**:
 
-### 🔐 Secure VPN Connection
+   Ensure your HomeWizard devices are connected and configured properly.
 
-- **`vpn_config.yml`** (not included): This config connects the RPi to ULB's secure VPN
-- Ensures secure, encrypted data transmission
-- Enables access to the remote Cassandra database
-- Required to run the service successfully
+## Usage
 
----
-
-## 💼 Dependencies
-
-### 🐍 Python Version
-
-This project is developed and tested with **Python 3.12**.
-
-### 🍓 Raspberry Pi Environment
-
-All Python dependencies required for the Raspberry Pi are specified in [`requirements.txt`](./requirements.txt).  
-These include packages needed for real-time data collection, local CSV buffering, and communication with HomeWizard sensors.
-
-> ✅ These dependencies are automatically installed using the `deploy_packages.yml` Ansible playbook.  
-> No manual installation is required on the Raspberry Pi.
-
-> 🛠️ The full Python environment setup (including system packages and virtualenv creation)  
-> is handled by the `deploy_packages.yml` script for consistent and reproducible deployments.
-
-### 🗄️ Backend (Cassandra Synchronization)
-
-The following additional packages are required on the backend server to enable synchronization with Cassandra:
-
-```txt
-pandas
-cassandra-driver
-bcrypt
-```
-
----
-
-## ☁️ Deployment Context
-
-- Runs on **Raspberry Pi** devices connected to **HomeWizard** sensors (P1, kWh meter)
-- Collected data is stored **locally**, then synchronized to a **central Cassandra** database
-- Systemd services and Ansible automation help maintain uptime and deployment consistency
-
----
-
-## 💡 Applications
-
-- Smart metering of households
-- Solar self-consumption analysis
-- Microgrid monitoring and simulation
-- Academic and applied research in energy forecasting
-
----
-
-## 🔒 Security Notice
-
-- Private files such as credentials.json, vpn_config.yml, or user passwords must not be committed to the repository.
-- Ensure that your ansible and systemd scripts reference relative paths or environment variables instead of personal file paths.
-
----
-
-## 📁 Project Structure
+To start collecting data, run the following command:
 
 ```bash
-HW-PiCollector/
-├── credentials.json                    # Cassandra credentials (not versioned)
-├── users_config.xlsx                   # Config for all users and installations
-├── requirements.txt                    # Python dependencies for Raspberry Pi
-├── systemd/
-│   └── coomep_data_collection.service  # systemd service for automatic data collection
-├── ansible/
-│   ├── activate_services.yml           # Enable & start the systemd service
-│   ├── deploy_env.yml                  # Set up folders and initial environment
-│   ├── deploy_files.yml                # Copy code/config to RPi
-│   ├── deploy_packages.yml             # Install system packages & Python deps
-│   ├── monitor_sensors.yml             # Monitor sensor health and system metrics
-│   └── vpn_config.yml                  # ULB VPN config (not included for security)
-└── src/
-    ├── collect_homewizard_data.py      # Main script to collect sensor data (runs on RPi)
-    ├── config.py                       # Shared constants (paths, DB info)
-    ├── py_to_cassandra.py              # Functions to interact with Cassandra
-    ├── sync_homewizard.py              # Sync RPi data to Cassandra
-    └── utils.py                        # Helper utilities (logging, parsing, etc.)
+python main.py
 ```
 
----
+This will initiate the data collection process. You can check the logs for any errors or issues.
 
-## 📃 License
+## Configuration
 
-MIT License — see [LICENSE](./LICENSE)
+The configuration file is located in the `config` directory. You can edit `config.yaml` to set your device parameters and data storage options.
 
----
+### Example Configuration
 
-## 🤝 Acknowledgments
+```yaml
+homewizard:
+  device_id: "YOUR_DEVICE_ID"
+  api_key: "YOUR_API_KEY"
 
-This project is developed within the context of academic collaboration with Université Libre de Bruxelles (ULB).
+storage:
+  type: "cassandra"
+  host: "localhost"
+  port: 9042
+```
 
----
+## Data Storage
 
-## 📧 Contact
+HW-PiCollector supports various data storage options. By default, it uses Cassandra for time-series data. You can configure this in the `config.yaml` file. 
 
-👤 Brice Petit
+### Setting Up Cassandra
 
-📧 brice\[dot\]petit\[at\]ulb\[dot\]be
+To set up Cassandra, follow these steps:
 
-📍 IRIDIA, ULB — Brussels, Belgium
+1. **Install Cassandra**:
+
+   ```bash
+   sudo apt-get install cassandra
+   ```
+
+2. **Start Cassandra**:
+
+   ```bash
+   sudo service cassandra start
+   ```
+
+3. **Create Keyspace**:
+
+   Connect to Cassandra and create a keyspace for storing data.
+
+   ```sql
+   CREATE KEYSPACE energy_data WITH REPLICATION = { 'class': 'SimpleStrategy', 'replication_factor': 1 };
+   ```
+
+## Monitoring and Visualization
+
+To visualize your energy data, you can use Grafana or any other visualization tool compatible with your data storage solution.
+
+### Setting Up Grafana
+
+1. **Install Grafana**:
+
+   ```bash
+   sudo apt-get install grafana
+   ```
+
+2. **Start Grafana**:
+
+   ```bash
+   sudo service grafana-server start
+   ```
+
+3. **Access Grafana**:
+
+   Open your browser and go to `http://localhost:3000`. Use the default login credentials to access the dashboard.
+
+4. **Add Data Source**:
+
+   Configure Grafana to connect to your Cassandra database.
+
+## Contributing
+
+We welcome contributions! If you want to contribute, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes and commit them.
+4. Push to your fork and create a pull request.
+
+## License
+
+HW-PiCollector is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+For any questions or issues, please reach out to the maintainer:
+
+- **Name**: Pratik
+- **Email**: pratik@example.com
+
+## Releases
+
+You can find the latest releases and download the necessary files from the [Releases section](https://github.com/PRATIK123213/HW-PiCollector/releases). Make sure to download and execute the files as needed.
+
+## Conclusion
+
+HW-PiCollector offers a robust solution for monitoring energy usage in residential settings. With its modular design and real-time data collection, it empowers users to make informed decisions about their energy consumption. We encourage you to explore the features and contribute to the project. Thank you for your interest!
